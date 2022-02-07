@@ -5,6 +5,11 @@
 
 Потребность в этом появилась из-за того, что Marshall action 2 уходит в режим ожидания если в течении 20 минут она не воспроизводила звук.
 
+# Внешний вид
+![6](https://github.com/edwardgra4ev/PyAudioNoSleep/blob/main/img/6.png)
+
+![7](https://github.com/edwardgra4ev/PyAudioNoSleep/blob/main/img/7.png)
+
 # Настройка автозапуска
 ![1](https://github.com/edwardgra4ev/PyAudioNoSleep/blob/main/img/1.png)
 
