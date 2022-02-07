@@ -82,12 +82,16 @@ class App(QtWidgets.QMainWindow, gui.Ui_MainWindow):
         self.spin_second.setValue(int(self.second))
         
     def save_setting(self) -> None:
-        self.config.write_config(
-            second=str(self.spin_second.value()),
-            devices=self.output_devices.currentText(),
-            file=self.output_files.currentText()
-        )
+        try:
+            self.config.write_config(
+                second=str(self.spin_second.value()),
+                devices=self.output_devices.currentText(),
+                file=self.output_files.currentText()
+            )
+        except BaseException as e:
+           self.label.setText(e)
         self.read_config()
+        self.worker.read_config()
 
     
     def read_config(self) -> None:
@@ -96,27 +100,28 @@ class App(QtWidgets.QMainWindow, gui.Ui_MainWindow):
          
 class SoudPlay(QtCore.QObject):
     
-    def run(self) -> None:
-        try:
-            count = 0
-            while True:
-                second, devices, file = config.Config().read_config()
-                if count >= int(second):
-                    self.play(devices, file)
-                    count = 0
-                else:
-                    count += 1
-                    time.sleep(1)
-        except AttributeError:
-            time.sleep(1)
+    def read_config(self) -> None:
+        self.second, self.devices, self.file = config.Config().read_config()
     
-    def play(self, devices, file) -> None:
+    def run(self) -> None:
+        self.read_config()
+        count = 0
+        while True:
+            if count >= int(self.second):
+                self.play()
+                count = 0
+            else:
+                count += 1
+                time.sleep(1)
+  
+    
+    def play(self) -> None:
         chunk = 1024
-        wf = wave.open(All_AUDIO_FILES.get(file), 'rb')
+        wf = wave.open(All_AUDIO_FILES.get(self.file), 'rb')
         stream = audio.open(format=audio.get_format_from_width(wf.getsampwidth()),
                         channels=wf.getnchannels(),
                         rate=wf.getframerate(),
-                        output_device_index=All_OUTPUT_AUDIO_DEVICES.get(devices).get("index"),
+                        output_device_index=All_OUTPUT_AUDIO_DEVICES.get(self.devices).get("index"),
                         output=True)
 
         data = wf.readframes(chunk)
